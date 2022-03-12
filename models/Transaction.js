@@ -24,14 +24,14 @@ const TransactionSchema = new Schema({
         type: String,
         required: [true, 'Please provide account name']
     },
-    color: {
-        type: String,
-        required: [true, 'Please provide color'],
-        // enum: {
-        //     values: ENUM.color,
-        //     message: '{VALUE} is not supported'
-        // },
-    },
+    // color: {
+    //     type: String,
+    //     required: [true, 'Please provide color'],
+    //     // enum: {
+    //     //     values: ENUM.color,
+    //     //     message: '{VALUE} is not supported'
+    //     // },
+    // },
     comment: {
         type: String,
         default: '',
@@ -43,9 +43,9 @@ const TransactionSchema = new Schema({
         required: [true, 'Please provide category name'],
         // IS ENUM NEEDED?
     },
-    icon: {
-        type: String,
-    },
+    // icon: {
+    //     type: String,
+    // },
     createdBy: {
         type: Types.ObjectId,
         ref: 'User',

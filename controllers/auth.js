@@ -1,6 +1,6 @@
 const User = require("../models/User")
 const { StatusCodes } = require('http-status-codes')
-const { BadRequestError, UnauthenticatedError } = require("../errors")
+const { BadRequestError, UnauthenticatedError, NotFoundError } = require("../errors")
 
 
 const register = async (req, res) => {
@@ -25,7 +25,7 @@ const login = async (req, res) => {
 }
 
 const deleteAccount = async (req, res) => {
-    const user = await User.findByIdAndDelete(req.body.userId)
+    const user = await User.findByIdAndDelete(req.user.userId)
     if (!user) throw new NotFoundError(`No user with id ${req.body.userId}`)
     res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email } })
 }
