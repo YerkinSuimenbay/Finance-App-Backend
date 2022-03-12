@@ -6,7 +6,7 @@ const { StatusCodes } = require('http-status-codes')
 const { NotFoundError, BadRequestError } = require("../errors")
 
 const groupTransactionsByCategory = async (transactions, createdBy) => {
-console.log(transactions);
+console.log({transactions});
 
     const allCategories = transactions.reduce((acc, curr) => {
       if (!acc.includes(curr.category)) acc.push(curr.category)
@@ -40,12 +40,36 @@ console.log(transactions);
 }
 
 const getAllTransactions = async (req, res) => {
-    const { category, type, grouped } = req.query
+    const { category, type, grouped, period } = req.query
 
     const queryObject = { createdBy: req.user.userId }
-    if (type) queryObject.type = type
+    if (type) queryObject.type = type  // expense OR income
     if (category) queryObject.category = category  // FOR FILTER
-    
+    if (period) { 
+        if (period === 'day') {
+            const milliSeconds = 24 * 60 * 60 * 1000 // MILLI SECONDS
+            queryObject.createdAt = {
+                "$gte" : new Date(Date.now() - milliSeconds), 
+            }
+        } else if (period === 'week') {
+            const milliSeconds = 7 * 24 * 60 * 60 * 1000 // MILLI SECONDS
+            queryObject.createdAt = {
+                "$gte" : new Date(Date.now() - milliSeconds), 
+            }
+        } else if (period === 'mongth') {
+            const milliSeconds = 30 * 24 * 60 * 60 * 1000 // MILLI SECONDS
+            queryObject.createdAt = {
+                "$gte" : new Date(Date.now() - milliSeconds), 
+            }
+        } else if (period === 'period') {
+            // const milliSeconds = 24 * 60 * 60 * 1000 // MILLI SECONDS
+            // queryObject.createdAt = {
+            //     "$gte" : new Date(Date.now() - milliSeconds), 
+            // }
+        }
+    } // day, weeek, mongth, year, period
+
+    console.log(queryObject);
     const transactions = await Transaction.find(queryObject)
 
     if (grouped === 'true') {  // AS 'false' IS NOT EQUAL TO false

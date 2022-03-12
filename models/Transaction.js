@@ -54,7 +54,8 @@ const TransactionSchema = new Schema({
     },
     createdAt: {
         type: Date, 
-        default: Date.now
+        default: Date.now,
+        required: [true, 'Please provide created date']
     }
 }, 
 // { timestamps: true }
