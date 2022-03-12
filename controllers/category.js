@@ -3,7 +3,12 @@ const { StatusCodes } = require('http-status-codes')
 const { NotFoundError, BadRequestError } = require("../errors")
 
 const getAllCategories = async (req, res) => {
-    const categories = await Category.find({ createdBy: req.user.userId }).sort('type')
+    const { type } = req.query
+
+    const queryObject = { createdBy: req.user.userId }
+    if (type) queryObject.type = type
+
+    const categories = await Category.find(queryObject).sort('type')
     res.status(StatusCodes.OK).json({ categories })
 }
 const createCategory = async (req, res) => {

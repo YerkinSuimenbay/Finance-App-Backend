@@ -4,19 +4,20 @@ const ENUM = require('../utils/enums')
 const TransactionSchema = new Schema({
     type: {
         type: String,
+        required: [true, 'Please provide transaction type'],
         enum: {
             values: ['income', 'expense'],
             message: '{VALUE} is not supported'
         },
-        default: 'expense',
+        // default: 'expense',
     },
     amount: {
         type: Number,
-        required: [true, 'Please provide the amount of transaction'],
+        required: [true, 'Please provide amount of transaction'],
     },
     currency: {
         type: String,
-        required: [true, 'Please provide the transaction currency']
+        required: [true, 'Please provide transaction currency']
     },
     account: {
         // type: Types.ObjectId,
@@ -50,7 +51,13 @@ const TransactionSchema = new Schema({
         type: Types.ObjectId,
         ref: 'User',
         required: [true, 'Please provide user id']
+    },
+    createdAt: {
+        type: Date, 
+        default: Date.now
     }
-}, { timestamps: true })
+}, 
+// { timestamps: true }
+)
 
 module.exports = model('Transaction', TransactionSchema)

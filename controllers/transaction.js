@@ -6,6 +6,8 @@ const { StatusCodes } = require('http-status-codes')
 const { NotFoundError, BadRequestError } = require("../errors")
 
 const groupTransactionsByCategory = async (transactions, createdBy) => {
+console.log(transactions);
+
     const allCategories = transactions.reduce((acc, curr) => {
       if (!acc.includes(curr.category)) acc.push(curr.category)
       return acc
@@ -14,7 +16,7 @@ const groupTransactionsByCategory = async (transactions, createdBy) => {
         name: allCategories,
         createdBy
     })
-    console.log({dbAllCategories}, typeof dbAllCategories);
+    
     let transactionsGroupedByCategory = []
     dbAllCategories.forEach(dbCategory => {
         const transactionsWithSameCategory = transactions.filter(transaction => transaction.category === dbCategory.name) 
@@ -39,10 +41,8 @@ const groupTransactionsByCategory = async (transactions, createdBy) => {
 
 const getAllTransactions = async (req, res) => {
     const { category, type, grouped } = req.query
-console.log(req.query);
-    const queryObject = {
-        createdBy: req.user.userId
-    }
+
+    const queryObject = { createdBy: req.user.userId }
     if (type) queryObject.type = type
     if (category) queryObject.category = category  // FOR FILTER
     
@@ -61,7 +61,7 @@ console.log(req.query);
     }
 }
 const createTransaction = async (req, res) => {
-    if (req.body.amount === 0) throw new BadRequestError('Please fill the amount of transaction')
+    if (req.body.amount === 0) throw new BadRequestError('Please fill  transaction amount')
     req.body.createdBy = req.user.userId
 
     const account = await Account.findOne({ name: req.body.account, createdBy: req.body.createdBy })
