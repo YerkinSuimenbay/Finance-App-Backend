@@ -1,6 +1,7 @@
 const Transaction = require("../models/Transaction")
 const Account = require("../models/Account")
 const Category = require("../models/Category")
+const moment = require('moment')
 
 const { StatusCodes } = require('http-status-codes')
 const { NotFoundError, BadRequestError } = require("../errors")
@@ -61,11 +62,26 @@ const getAllTransactions = async (req, res) => {
             queryObject.createdAt = {
                 "$gte" : new Date(Date.now() - milliSeconds), 
             }
+        } else if (period === 'year') {
+            const milliSeconds = 365 * 30 * 24 * 60 * 60 * 1000 // MILLI SECONDS
+            queryObject.createdAt = {
+                "$gte" : new Date(Date.now() - milliSeconds), 
+            }
         } else if (period === 'period') {
-            // const milliSeconds = 24 * 60 * 60 * 1000 // MILLI SECONDS
-            // queryObject.createdAt = {
-            //     "$gte" : new Date(Date.now() - milliSeconds), 
-            // }
+            const { from, to } = req.query
+
+            if (!from || !to) {
+                // throw new BadRequestError('Please, provide both dates')
+            } else {
+                if (!moment(from).isValid() || !moment(to).isValid()) throw new BadRequestError('Please provide valid dates')
+                if (new Date(to) - new Date(from) < 0) throw new BadRequestError('First date cannot be later than second date')
+    
+                queryObject.createdAt = {
+                    "$gte" : new Date(from), 
+                    "$lte" : new Date(to), 
+                }
+            }
+            
         }
     } // day, weeek, mongth, year, period
 
