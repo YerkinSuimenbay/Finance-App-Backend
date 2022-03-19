@@ -7,7 +7,7 @@ const { StatusCodes } = require('http-status-codes')
 const { NotFoundError, BadRequestError } = require("../errors")
 
 const groupTransactionsByCategory = async (transactions, createdBy) => {
-console.log({transactions});
+// console.log({transactions});
 
     const allCategories = transactions.reduce((acc, curr) => {
       if (!acc.includes(curr.category)) acc.push(curr.category)
@@ -19,6 +19,13 @@ console.log({transactions});
     })
     
     let transactionsGroupedByCategory = []
+
+    const TOTAL = transactions.reduce((acc, curr) => {
+        acc += curr.amount
+        return acc
+    }, 0)
+    // console.log({TOTAL});
+
     dbAllCategories.forEach(dbCategory => {
         const transactionsWithSameCategory = transactions.filter(transaction => transaction.category === dbCategory.name) 
         let sum = 0
@@ -30,6 +37,7 @@ console.log({transactions});
             color: dbCategory.color,
             type: dbCategory.type,
             amount: sum,
+            percentage: Math.floor(sum * 100 / TOTAL),
             currency: transactionsWithSameCategory[0].currency,
         }
 // console.log({ transaction });
@@ -85,7 +93,7 @@ const getAllTransactions = async (req, res) => {
         }
     } // day, weeek, mongth, year, period
 
-    console.log(queryObject);
+    // console.log(queryObject);
     const transactions = await Transaction.find(queryObject)
 
     if (grouped === 'true') {  // AS 'false' IS NOT EQUAL TO false
@@ -101,16 +109,36 @@ const getAllTransactions = async (req, res) => {
     }
 }
 const createTransaction = async (req, res) => {
-    if (req.body.amount === 0) throw new BadRequestError('Please fill  transaction amount')
-    req.body.createdBy = req.user.userId
+    if (+req.body.amount === 0) throw new BadRequestError('Please fill transaction amount')
+    
+    // const account = await Account.findOne({ name: req.body.account, createdBy: req.user.userId })
+    // const category = await Category.findOne({ name: req.body.category, createdBy: req.user.userId })
+    // req.body.currency = account.currency
+    // req.body.color = category.color
+    // req.body.icon = category.icon
 
-    const account = await Account.findOne({ name: req.body.account, createdBy: req.body.createdBy })
-    const category = await Category.findOne({ name: req.body.category, createdBy: req.body.createdBy })
+    
+    const [account, category] = await Promise.all([
+        Account.findOne({ name: req.body.account, createdBy: req.user.userId }),
+        Category.findOne({ name: req.body.category, createdBy: req.user.userId })
+    ])
+
+    if (!account) throw new BadRequestError('Please show account')
+    if (!category) throw new BadRequestError('Please show category')
     req.body.currency = account.currency
     req.body.color = category.color
     req.body.icon = category.icon
+    
+    req.body.createdBy = req.user.userId
 
-    const transaction = await Transaction.create(req.body)
+    if (req.body.type === 'expense') account.totalCash -= Number(req.body.amount)
+    else if (req.body.type === 'income') account.totalCash += Number(req.body.amount)
+    // await account.save()
+    const [transaction, updatedAccount] = await Promise.all([
+        Transaction.create(req.body),
+        account.save()
+    ])
+
     res.status(StatusCodes.CREATED).json({ transaction })
 }
 const getTransaction = async (req, res) => {
@@ -125,25 +153,52 @@ const getTransaction = async (req, res) => {
     res.status(StatusCodes.OK).json({ transaction })
 }
 const updateTransaction = async (req, res) => {
-    const account = await Account.findOne({ name: req.body.account })
-    console.log(account);
-    req.body.currency = account.currency
+    if (+req.body.amount === 0) throw new BadRequestError('Please fill  transaction amount')
 
     const {
         user: { userId },
         params: { transactionId },
         body
     } = req
+
+    const account = await Account.findOne({ name: req.body.account, createdBy: req.user.userId })
+    if (!account) throw new BadRequestError('Please show account')
     
-
-    const transaction = await Transaction.findOneAndUpdate({ _id: transactionId, createdBy: userId }, body, {
-        new: true,
-        runValidators: true
-    })
-
+    const transaction = await Transaction.findOne({ _id: transactionId, createdBy: userId })
     if (!transaction) throw new NotFoundError(`No transaction with id ${transactionId}`)
+    
+    if (body.type === 'expense') account.totalCash -= Number(body.amount) - transaction.amount 
+    else if (body.type === 'income') account.totalCash += Number(body.amount) - transaction.amount
+    // await account.save()
+    
+    transaction.account = body.account
+    transaction.amount = body.amount
+    transaction.category = body.category
+    transaction.comment = body.comment
+    transaction.createdAt = body.createdAt
+    transaction.createdBy = body.createdBy
+    transaction.currency = account.currency
+    transaction.type = body.type
+    
+    // const transaction = await Transaction.findOneAndUpdate(
+    //     { _id: transactionId, createdBy: userId }, 
+    //     body, 
+    //     {
+    //         // new: true,
+    //         runValidators: true
+    //     },
+    //     // (err, doc, res) => {
+    //     //     console.log({err, doc, res});
+    //     // }
+    // )
 
-    res.status(StatusCodes.OK).json({ transaction })
+   
+    const [updatedTransaction, updatedAccount] = await Promise.all([
+        transaction.save(),
+        account.save()
+    ])
+
+    res.status(StatusCodes.OK).json({ transaction: updatedTransaction })
 }
 const deleteTransaction = async (req, res) => {
     const {

@@ -17,7 +17,11 @@ const TransactionSchema = new Schema({
     },
     currency: {
         type: String,
-        required: [true, 'Please provide transaction currency']
+        required: [true, 'Please provide transaction currency'],
+        enum: {
+            values: ['KZT', 'RUB', 'USD'],
+            message: '{VALUE} is not supported'
+        },
     },
     account: {
         // type: Types.ObjectId,

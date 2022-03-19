@@ -4,7 +4,17 @@ const { NotFoundError, BadRequestError } = require("../errors")
 
 const getAllAccounts = async (req, res) => {
     const accounts = await Account.find({ createdBy: req.user.userId }).sort('currency')
-    res.status(StatusCodes.OK).json({ accounts })
+
+    const KZTExchangeRates = {
+        RUB: 5.6,
+        USD: 550
+    }
+    const total = accounts.reduce((accumulator, currentValue) => {
+        if (currentValue.currency === "RUB") return accumulator += currentValue.totalCash * KZTExchangeRates.RUB
+        if (currentValue.currency === "USD") return accumulator += currentValue.totalCash * KZTExchangeRates.USD
+        return accumulator += currentValue.totalCash
+    }, 0)
+    res.status(StatusCodes.OK).json({ accounts, total })
 }
 const createAccount = async (req, res) => {
     req.body.createdBy = req.user.userId
