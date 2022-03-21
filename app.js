@@ -16,6 +16,7 @@ const authRouter = require('./routes/auth')
 const transactionRouter = require('./routes/transaction')
 const accountRouter = require('./routes/account')
 const categoryRouter = require('./routes/category')
+const userRouter = require('./routes/user')
 
 const app = express()
 const PORT = process.env.PORT || 8000
@@ -30,9 +31,11 @@ app.use(express.json())
 
 
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/user', authenticateUser, userRouter)
 app.use('/api/v1/transactions', authenticateUser, transactionRouter)
 app.use('/api/v1/accounts', authenticateUser, accountRouter)
 app.use('/api/v1/categories', authenticateUser, categoryRouter)
+// app.use('/api/v1/settings', authenticateUser, settingsRouter)
 
 
 app.use(notFoundMiddleware)

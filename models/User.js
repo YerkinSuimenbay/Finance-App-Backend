@@ -24,6 +24,31 @@ const UserSchema = new Schema({
         type: String,
         required: [true, 'Please provide password'],
         minLength: 5,
+    },
+    settings: {
+        app_language: {
+            type: String,
+            // enum: {
+            //     values: ['kz', 'ru', 'en'],
+            //     message: '{VALUE} is not supported'
+            // },
+            // default: 'en'
+            required: [true, 'Please provide app language'],
+
+        },
+        default_account: {
+            type: String,
+            required: [true, 'Please provide default account'],
+        },
+        default_period: {
+            type: String,
+            required: [true, 'Please provide default period'],
+            // enum: {
+            //     values: ['Day', 'Week', 'Month', 'Year'],
+            //     message: '{VALUE} is not supported'
+            // },
+            // default: 'Day'
+        },
     }
 })
 

@@ -4,9 +4,15 @@ const { BadRequestError, UnauthenticatedError, NotFoundError } = require("../err
 
 
 const register = async (req, res) => {
+    req.body.settings = {
+        app_language: 'en',
+        default_account: 'main',
+        default_period: 'Day',
+    }
     const user = await User.create(req.body)
-
+    
     const token = user.generateToken()
+
     res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email }, token })
 }
 const login = async (req, res) => {
@@ -21,7 +27,7 @@ const login = async (req, res) => {
     if (!correctPassword) throw new UnauthenticatedError('Invalid credentials _pwd_')
 
     const token = user.generateToken()
-    res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email }, token })
+    res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email, settings: user.settings }, token })
 }
 
 const deleteAccount = async (req, res) => {
