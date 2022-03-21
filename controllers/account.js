@@ -1,4 +1,5 @@
 const Account = require("../models/Account")
+const Transaction = require("../models/Transaction") 
 const { StatusCodes } = require('http-status-codes')
 const { NotFoundError, BadRequestError } = require("../errors")
 
@@ -54,15 +55,44 @@ const updateAccount = async (req, res) => {
     })
     if (accountAlreadyExists) throw new BadRequestError(`Account with name ${req.body.name} already exists!`)
 
-    const account = await Account.findOneAndUpdate(
-        { _id: accountId, createdBy: userId }, 
-        body, 
-        { new: true, runValidators: true }
-    )
-
+    // const account = await Account.findOneAndUpdate(
+    //     { _id: accountId, createdBy: userId }, 
+    //     body, 
+    //     { new: true, runValidators: true }
+    // )
+    const account = await Account.findOne({ _id: accountId, createdBy: userId })
     if (!account) throw new NotFoundError(`No category with id ${accountId}`)
 
-    res.status(StatusCodes.OK).json({ account })
+    account.totalCash = body.totalCash
+    account.name = body.name
+    account.icon = body.icon
+    account.color = body.color
+    account.currency = body.currency
+    account.createdBy = body.createdBy
+
+    const [updatedAccount, updatedTransactions] = await Promise.all([
+        account.save(),
+        Transaction.updateMany(
+            { 
+                name: { $regex: new RegExp("^" + req.body.name + "$", "i") }, 
+                createdBy: req.body.createdBy
+            },
+            { currency: body.currency },
+        )
+    ])
+
+    // await Transaction.updateMany(
+    //     { 
+    //         name: { $regex: new RegExp("^" + req.body.name + "$", "i") }, 
+    //         createdBy: req.body.createdBy
+    //     },
+    //     // {
+    //     //     $set: { currency: body.currency }
+    //     // },
+    //     { currency: body.currency },
+    // )
+
+    res.status(StatusCodes.OK).json({ account: updatedAccount })
 }
 const deleteAccount = async (req, res) => {
     const { 
