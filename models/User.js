@@ -53,7 +53,6 @@ const UserSchema = new Schema({
 })
 
 UserSchema.pre('save', async function(next) {
-    console.log('pre save called');
     const salt = await bcryptjs.genSalt(10)
     this.password = await bcryptjs.hash(this.password, salt) // hashedPassword
     next()
@@ -70,7 +69,7 @@ UserSchema.methods.generateToken = function() {
 
 UserSchema.methods.checkPassword = async function(candidatePassword) {
     const isMatch = await bcryptjs.compare(candidatePassword, this.password)
-    console.log('check password called', {candidatePassword, pwd: this.password, isMatch});
+    console.log({isMatch});
     return isMatch
 }
 

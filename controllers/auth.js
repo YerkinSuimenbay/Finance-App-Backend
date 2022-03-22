@@ -26,8 +26,6 @@ const login = async (req, res) => {
     const correctPassword = await user.checkPassword(password)
     if (!correctPassword) throw new UnauthenticatedError('Invalid credentials _pwd_')
 
-    console.log({user});
-
     const token = user.generateToken()
     res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email, settings: user.settings }, token })
 }
