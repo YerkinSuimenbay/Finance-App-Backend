@@ -1,16 +1,27 @@
 const User = require("../models/User")
+const Category = require("../models/Category")
 const { StatusCodes } = require('http-status-codes')
 const { BadRequestError, UnauthenticatedError, NotFoundError } = require("../errors")
 
+const categoriesJSON = require('../utils/categories.json')
 
 const register = async (req, res) => {
     req.body.settings = {
-        app_language: 'en',
-        default_account: 'main',
+        app_language: 'Русский',
+        default_account: '',
         default_period: 'Day',
     }
     const user = await User.create(req.body)
-    
+
+    const basicCategories = categoriesJSON.map(category => ({ ...category, createdBy: user._id }))
+
+    for( var i = 0; i < basicCategories.length; i++ ) {
+		new Category( basicCategories[ i ] ).save();
+	}
+    // const categories = Category(basicCategories)
+    // console.log({categoriesJSON, basicCategories, categories});
+    // await categories.save()
+
     const token = user.generateToken()
 
     res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email, settings: user.settings }, token })

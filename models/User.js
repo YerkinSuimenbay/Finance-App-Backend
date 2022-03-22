@@ -38,7 +38,7 @@ const UserSchema = new Schema({
         },
         default_account: {
             type: String,
-            required: [true, 'Please provide default account'],
+            // required: [true, 'Please provide default account'],
         },
         default_period: {
             type: String,
@@ -69,7 +69,7 @@ UserSchema.methods.generateToken = function() {
 
 UserSchema.methods.checkPassword = async function(candidatePassword) {
     const isMatch = await bcryptjs.compare(candidatePassword, this.password)
-    console.log({isMatch});
+    console.log({isMatch, candidatePassword, pwd: this.password});
     return isMatch
 }
 

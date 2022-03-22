@@ -1,0 +1,93 @@
+[
+    {
+        "color": "#ffa200",
+        "icon": "GiMeal",
+        "name": "Food",
+        "type": "expense"
+    },
+    {
+        "color": "#d312b9",
+        "icon": "FaTheaterMasks",
+        "name": "Entertainment",
+        "type": "expense"
+    },
+    {
+        "color": "#ff0a0a",
+        "icon": "RiHeartPulseFill",
+        "name": "Health",
+        "type": "expense"
+    },
+    {
+        "color": "#ffbb00",
+        "icon": "AiFillCar",
+        "name": "Taksi",
+        "type": "expense"
+    },
+    {
+        "color": "#13c316",
+        "icon": "FaHands",
+        "name": "Charity",
+        "type": "expense"
+    },
+    {
+        "color": "#1c9239",
+        "icon": "FaTshirt",
+        "name": "Clothes",
+        "type": "expense"
+    },
+    {
+        "color": "#723ad9",
+        "icon": "AiFillGift",
+        "name": "Gift",
+        "type": "expense"
+    },
+    {
+        "color": "#302c2c",
+        "icon": "BiCut",
+        "name": "Haircut",
+        "type": "expense"
+    },
+    {
+        "color": "#1daa68",
+        "icon": "GiSlicedBread",
+        "name": "Products",
+        "type": "expense"
+    },
+    {
+        "color": "#0cd42e",
+        "icon": "IoIosFitness",
+        "name": "Fitness",
+        "type": "expense"
+    },
+    {
+        "color": "#ff0000",
+        "icon": "AiOutlineQuestion",
+        "name": "Other ",
+        "type": "expense"
+    },
+    {
+        "color": "#13953a",
+        "icon": "RiBusFill",
+        "name": "Onai",
+        "type": "expense"
+    },
+    {
+        "color": "#0091ff",
+        "icon": "GiReceiveMoney",
+        "name": "Salary",
+        "type": "income"
+    },
+    {
+        "color": "#723ad9",
+        "icon": "AiFillGift",
+        "name": "Gift (income)",
+        "type": "income"
+    },
+    {
+        "color": "#21b31e",
+        "icon": "AiOutlineQuestion",
+        "name": "Other (income)",
+        "type": "income"
+    }
+
+]
