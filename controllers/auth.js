@@ -13,7 +13,7 @@ const register = async (req, res) => {
     
     const token = user.generateToken()
 
-    res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email }, token })
+    res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email, settings: user.settings }, token })
 }
 const login = async (req, res) => {
     const { email, password } = req.body
@@ -23,8 +23,10 @@ const login = async (req, res) => {
     const user = await User.findOne({ email })
     if (!user) throw new UnauthenticatedError('Invalid credentials _eml_')
 
-    const correctPassword = user.checkPassword(password)
+    const correctPassword = await user.checkPassword(password)
     if (!correctPassword) throw new UnauthenticatedError('Invalid credentials _pwd_')
+
+    console.log({user});
 
     const token = user.generateToken()
     res.status(StatusCodes.OK).json({ user: { name: user.name, email: user.email, settings: user.settings }, token })
