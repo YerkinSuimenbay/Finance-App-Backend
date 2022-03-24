@@ -52,11 +52,18 @@ const UserSchema = new Schema({
     }
 })
 
-UserSchema.pre('save', async function(next) {
+// UserSchema.pre('save', async function(next) {
+//     const salt = await bcryptjs.genSalt(10)
+//     this.password = await bcryptjs.hash(this.password, salt) // hashedPassword
+//     console.log('save called', {pwd: this.password});
+//     next()
+// })
+UserSchema.methods.hashPassword = async function(pwd) {
     const salt = await bcryptjs.genSalt(10)
-    this.password = await bcryptjs.hash(this.password, salt) // hashedPassword
-    next()
-})
+    const hashedPassword = await bcryptjs.hash(pwd, salt) // hashedPassword
+    console.log('save called', {pwd: this.password});
+    return hashedPassword
+}
 
 UserSchema.methods.generateToken = function() {
     const payload = {

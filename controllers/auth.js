@@ -11,7 +11,12 @@ const register = async (req, res) => {
         default_account: '',
         default_period: 'Day',
     }
-    const user = await User.create(req.body)
+
+    // const hashedPassword = await User.hashPassword(req.body.password)
+    // const user = await User.create(req.body)
+    const user = new User(req.body)
+    user.password = await user.hashPassword(req.body.password)
+    await user.save()
 
     const basicCategories = categoriesJSON.map(category => ({ ...category, createdBy: user._id }))
 

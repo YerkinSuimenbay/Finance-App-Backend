@@ -35,7 +35,7 @@ const updateUserPassword = async (req, res) => {
     if (repeatPwd !== newPwd) throw new BadRequestError('Repeat password not equal to new password')
 
 
-    user.password = newPwd
+    user.password = await user.hashPassword(newPwd)
     await user.save()
 
     res.status(StatusCodes.OK).json({ name: user.name, email: user.email, settings: user.settings })
